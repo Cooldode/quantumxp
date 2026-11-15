@@ -62,6 +62,37 @@ html, body, .stMarkdown, .stMarkdown p, label, input, textarea, h1, h2, h3, h4 {
 .qx-card h4 { margin:.3rem 0 .35rem; font-size:1.02rem; font-weight:600; color:#F3F1FF; }
 .qx-card p { margin:0; color:#A9A6CF; font-size:.92rem; line-height:1.5; }
 
+/* Home page boxes */
+.st-key-home_play {
+  background: linear-gradient(135deg, rgba(139,92,246,0.28), rgba(34,211,238,0.10));
+  border: 1px solid rgba(167,139,250,0.45); border-radius: 22px;
+  padding: 1.6rem 1.8rem; margin-bottom: 1.2rem;
+}
+.st-key-explore_acc, .st-key-explore_laptop, .st-key-explore_com {
+  background: rgba(23,24,58,0.75); border: 1px solid rgba(167,139,250,0.18);
+  border-radius: 18px; padding: 1.1rem 1.2rem; min-height: 230px;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.st-key-explore_acc:hover, .st-key-explore_laptop:hover, .st-key-explore_com:hover {
+  border-color: #A78BFA; transform: translateY(-2px);
+}
+.qx-eyebrow { font-family:'JetBrains Mono', monospace; color:#67E8F9; font-size:.78rem;
+              letter-spacing:.08em; text-transform:uppercase; }
+.qx-box-title { font-size:1.9rem; font-weight:800; letter-spacing:-.02em; margin:.25rem 0 .4rem; }
+.qx-box-text { color:#B9B6DD; line-height:1.55; margin:0 0 .6rem; }
+.qx-small-icon { font-size:1.6rem; }
+.qx-small-title { font-size:1.15rem; font-weight:700; margin:.3rem 0 .35rem; }
+.qx-section { font-size:1.25rem; font-weight:700; margin:1.4rem 0 .6rem; }
+.qx-deal { display:flex; gap:.7rem; justify-content:center; }
+.qx-pcard { width:72px; height:100px; border-radius:12px; display:flex; align-items:center;
+            justify-content:center; font-size:2.2rem; font-weight:800; color:#0E0F27;
+            background: linear-gradient(160deg, #F5F3FF, #C4B5FD);
+            box-shadow: 0 10px 28px rgba(139,92,246,0.35); }
+.qx-pcard:nth-child(2) { transform: translateY(-8px) rotate(2deg); }
+.qx-pcard:nth-child(1) { transform: rotate(-4deg); }
+.qx-pcard:nth-child(3) { transform: rotate(5deg); }
+.qx-deal-caption { text-align:center; color:#B9B6DD; font-size:.9rem; margin-top:.9rem; }
+
 /* Metrics as cards */
 [data-testid="stMetric"] {
   background: rgba(23,24,58,0.75); border:1px solid rgba(167,139,250,0.20);

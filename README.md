@@ -85,6 +85,7 @@ streamlit run app.py
 
 - `game.py`: the referee, the quantum circuit and the classical team.
 - `app.py`: entry point: page navigation and theme.
+- `home.py`: the home page.
 - `play.py`: the game.
 - `ui.py`: shared page headers and styling (theme colors in `.streamlit/config.toml`).
 - `pages/1_The_accuracy_test.py`: the game as an accuracy test for the simulator.
