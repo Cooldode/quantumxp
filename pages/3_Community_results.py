@@ -15,13 +15,11 @@ import community  # noqa: E402
 
 CLASSICAL_LINE = 75.0   # best classical team with 3 players
 
-st.set_page_config(page_title="Community results")
 community.sidebar_account()
-st.title("Community results")
-st.write("Every run here is a real accuracy test published from someone's laptop: how "
-         "far the Quantum Rings compression dial could be turned down before the "
-         "quantum team started losing games. Anyone can read the board; sign in "
-         "only if you want to post a result or reply.")
+import ui  # noqa: E402
+ui.hero("Community", "Results from real laptops",
+        "Every run here is a real accuracy test published from someone's laptop. "
+        "Anyone can read the board; sign in only if you want to post a result or reply.")
 
 if not community.database_ready():
     st.info("The shared results database isn't set up on this laptop yet (the MongoDB "
@@ -87,7 +85,7 @@ if community.sign_in_box("reply", why="reply to this run"):
     with st.form("reply_form", clear_on_submit=True):
         text = st.text_area("Your reply", max_chars=community.MAX_REPLY,
                             placeholder="Did you get the same cheapest setting on your laptop?")
-        if st.form_submit_button("Post reply"):
+        if st.form_submit_button("Post reply", type="primary"):
             try:
                 community.post_reply(chosen, text)
                 st.rerun()

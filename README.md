@@ -77,7 +77,9 @@ streamlit run app.py
 ## Files
 
 - `game.py`: the referee, the quantum circuit and the classical team.
-- `app.py`: Part 1, the game.
+- `app.py`: entry point: page navigation and theme.
+- `play.py`: the game.
+- `ui.py`: shared page headers and styling (theme colors in `.streamlit/config.toml`).
 - `pages/1_The_accuracy_test.py`: the game as an accuracy test for the simulator.
 - `pages/2_Can_a_laptop_keep_up.py`: which circuits are easy or hard for a laptop.
 - `benchmark.py`: runs circuits with a time limit; the benchmarks and the accuracy test.

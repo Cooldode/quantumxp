@@ -1,4 +1,4 @@
-"""Part 2: Can a laptop keep up?
+"""Can a laptop keep up?
 
 Some quantum circuits are easy for a laptop to simulate and some get out of
 reach fast. This page lets people find the line themselves, with real runs
@@ -18,10 +18,12 @@ import community  # noqa: E402  (SSOJet sign-in)
 LIVE_LIMIT = 30      # seconds a live run may take before we give up on it
 FAST_SECONDS = 1.0   # "fast" means the simulation itself finished in under this
 
-st.set_page_config(page_title="Can a laptop keep up?")
 community.sidebar_account()
-st.title("Can a laptop keep up?")
-st.write("In Part 1, a laptop ran a 200-qubit quantum game in a fraction of a second "
+import ui  # noqa: E402
+ui.hero("Laptop vs. quantum", "Can a laptop keep up?",
+        "How Quantum Rings simulates hundreds of qubits on an ordinary laptop, "
+        "and where that trick has limits.")
+st.write("On the game page, a laptop ran a 200-qubit quantum game in a fraction of a second "
          "per round. That sounds impossible, so what is going on? This page lets you "
          "find out which quantum circuits are easy for a laptop and which ones are not.")
 st.caption("Every run on this page is real: it happens live on the Quantum Rings "
@@ -61,7 +63,7 @@ with tab_idea:
         st.error(f"{q} qubits do not fit in a laptop with 16 GB of memory. "
                  f"The full list is {size / 16e9:,.0f} times too big.")
     st.write("At 30 qubits the full list is already bigger than a typical laptop's memory. "
-             "Yet Part 1 ran 200 qubits. So the simulator must be doing something smarter.")
+             "Yet the game page ran 200 qubits. So the simulator must be doing something smarter.")
 
     st.subheader("The smart way: write down only the pattern")
     st.write("Quantum Rings keeps a compact description instead of the full list. "
@@ -69,7 +71,7 @@ with tab_idea:
     st.markdown("""
 1. **200 people each flipping their own coin.** Nobody depends on anybody.
    You can describe each person separately: 200 short notes. **Easy.**
-2. **200 people who all copy one leader.** That is the GHZ game from Part 1.
+2. **200 people who all copy one leader.** That is the GHZ game from the game page.
    One sentence describes everyone: "they all match". **Easy.**
 3. **200 people passing whispers back and forth, over and over, each one changing
    the message a little.** Now every answer depends on everyone else's in a
@@ -86,7 +88,7 @@ EXAMPLES = {
     "200 coins, each spinning on its own":
         {"family": "recipe", "n": 200, "spins": "random", "links": "none", "layers": 12,
          "story": "200 people each flipping their own coin. Nobody affects anybody."},
-    "The GHZ game from Part 1, 200 players":
+    "The GHZ game, 200 players":
         {"family": "game", "n": 200,
          "story": "200 people who all copy one leader, then twist and look."},
     "A scrambled group of 16":

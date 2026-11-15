@@ -25,10 +25,11 @@ LIVE_LIMIT = 20          # seconds one dial setting may take before we stop it
 PLAYERS = 3
 SHOTS = 25               # rounds per deal; 3 players have 4 deals, so 100 rounds
 
-st.set_page_config(page_title="The accuracy test")
 community.sidebar_account()
-st.title("The accuracy test")
-st.subheader("Can the simulator keep the quantum team perfect?")
+import ui  # noqa: E402
+ui.hero("The accuracy test", "Can the simulator keep the quantum team perfect?",
+        "Turn Quantum Rings' compression dial down and watch when the quantum team "
+        "starts losing games it should always win.")
 
 st.markdown("""
 **How the simulator fits big circuits on a laptop.** Quantum Rings saves memory by
@@ -115,7 +116,7 @@ b1, b2 = st.columns(2)
 if b1.button("Play 100 rounds at this setting", key="acc_one"):
     with st.spinner("Linking, scrambling, unscrambling, playing..."):
         history.append(run_one(total, layers, setting))
-if b2.button("Sweep the whole dial", key="acc_sweep"):
+if b2.button("Sweep the whole dial", key="acc_sweep", type="primary"):
     progress = st.progress(0.0)
     for i, rung in enumerate(benchmark.DIAL):
         row = run_one(total, layers, rung)
@@ -180,7 +181,7 @@ if history:
             if not community.database_ready():
                 st.info("Publishing isn't set up on this laptop yet (the MongoDB Atlas "
                         "connection is missing from .streamlit/secrets.toml).")
-            elif st.button("Publish to Community results", key="acc_publish"):
+            elif st.button("Publish to Community results", key="acc_publish", type="primary"):
                 try:
                     community.publish(receipt)
                     st.success("Published. See it on the Community results page.")
