@@ -22,7 +22,7 @@ import community  # noqa: E402  (SSOJet sign-in and the MongoDB Atlas results da
 import game       # noqa: E402  (the classical limit)
 
 HOSTED = os.path.isdir("/mount/src")     # true on the free online server, false on a laptop
-LIVE_LIMIT = 150 if HOSTED else 20       # seconds one dial setting may take before we stop it
+LIVE_LIMIT = 20          # seconds one dial setting may take before we stop it
 PLAYERS = 3
 SHOTS = 25               # rounds per deal; 3 players have 4 deals, so 100 rounds
 
@@ -98,6 +98,53 @@ def run_one(total, layers, setting):
                     "Peak memory (MiB)": None, "peak_bytes": None,
                     "Status": result["status"]})
     return row
+
+
+# ---------- On the free online server ----------
+# This test needs a real computer's processor. On the small free server a run
+# that takes about two seconds on a laptop was still going after two minutes,
+# so the online copy shows a sweep measured on a MacBook instead of running it.
+if HOSTED:
+    st.info("**This online copy can't run the test live.** It sits on a small free server, "
+            "where one run was still going after 2 minutes. The same run takes about "
+            "2 seconds on a MacBook. Below is a full sweep we measured on a MacBook. To run "
+            "it yourself, run the app on your own computer (steps at the bottom).")
+    measured = pd.DataFrame({
+        "Dial": ["2", "4", "8", "16", "32", "64", "128", "256", "Full accuracy"],
+        "dial_value": [2, 4, 8, 16, 32, 64, 128, 256, 512],
+        "Win rate (%)": [62.0, 90.0, 94.0, 99.0, 100.0, 100.0, 100.0, 100.0, 100.0],
+        "Seconds": [2.088, 2.096, 2.093, 2.089, 2.509, 1.776, 1.679, 1.783, 1.779]})
+    st.write("**Win rate across the dial** (20 qubits, 12 layers)")
+    points = alt.Chart(measured).mark_line(point=True).encode(
+        x=alt.X("dial_value:Q", scale=alt.Scale(type="log", base=2),
+                title="Compression dial (right = less compression; far right = full accuracy)"),
+        y=alt.Y("Win rate (%):Q", scale=alt.Scale(domain=[0, 100])),
+        tooltip=["Dial", "Win rate (%)", "Seconds"])
+    rule = alt.Chart(pd.DataFrame({"y": [classical]})).mark_rule(
+        color="red", strokeDash=[6, 4]).encode(y="y:Q")
+    st.altair_chart(points + rule, width="stretch")
+    st.error("At dial 2 the quantum team won 62% of rounds: below the 75% a team with no "
+             "quantum at all can reach.")
+    st.success("Cheapest setting that kept the quantum team perfect: 32.")
+    st.table(measured.drop(columns=["dial_value"]))
+    st.caption("Measured on a MacBook (Apple silicon, 64 GiB RAM), macOS 27.3, "
+               "QuantumRingsLib 0.12.2, CPU backend: 3 players + 17 helpers, 12 scrambling "
+               "layers, seed 7, 25 rounds on each of 4 deals. 99% is one lost round in 100, "
+               "so the exact cutoff can move by a step between runs.")
+    st.markdown("""
+**Run it on your own computer** (Python 3.11+ and a free Quantum Rings SDK key):
+
+```
+git clone https://github.com/Cooldode/quantumxp
+cd quantumxp
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+export QR_TOKEN="your-sdk-key"
+export QR_ACCOUNT="your-account-email"
+streamlit run app.py
+```
+""")
+    st.stop()
 
 
 # ---------- Controls ----------

@@ -145,7 +145,7 @@ def apply_style():
     except TypeError:                 # older Streamlit without size=
         st.logo(LOGO, icon_image=FAVICON)
     with st.sidebar:
-        st.caption("[About the project](https://quantumxp.us/about/) · "
+        st.caption("[About the project](https://quantumxp.us/) · "
                    "[Code](https://github.com/Cooldode/quantumxp)")
 
 
