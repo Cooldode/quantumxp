@@ -5,6 +5,7 @@ import streamlit as st
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FAVICON = os.path.join(ROOT, "assets", "favicon.png")
+LOGO = os.path.join(ROOT, "assets", "logo.png")
 
 CSS = """
 <style>
@@ -109,9 +110,9 @@ def apply_style():
     """Call once per run, from the app's entry point."""
     st.markdown(CSS, unsafe_allow_html=True)
     try:
-        st.logo(FAVICON, size="large")
+        st.logo(LOGO, icon_image=FAVICON, size="large")
     except TypeError:                 # older Streamlit without size=
-        st.logo(FAVICON)
+        st.logo(LOGO, icon_image=FAVICON)
 
 
 def hero(kicker, title, subtitle=""):

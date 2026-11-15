@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo.png">
+    <img src="assets/logo-light.png" alt="QuantumXP" width="440">
+  </picture>
+</p>
+
 # The game no classical team can always win
 
 A team game that no team of separated classical players can win every round, and that a team sharing
