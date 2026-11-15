@@ -34,6 +34,12 @@ html, body, .stMarkdown, .stMarkdown p, label, input, textarea, h1, h2, h3, h4 {
 .qx-brand b { font-size: 1.15rem; letter-spacing: -.01em; }
 .qx-brand span { color:#8C88B8; font-size:.78rem; display:block; margin-top:-.15rem; }
 
+/* Account control, pinned to the top-right corner */
+.st-key-qx_account {
+  position: fixed; top: .7rem; right: 4.2rem; z-index: 999991; width: auto !important;
+}
+.st-key-qx_account button { padding: .35rem .95rem; border-radius: 999px; }
+
 /* Page header */
 .qx-hero { padding: .4rem 0 1.4rem; margin-bottom: 1.2rem;
            border-bottom: 1px solid rgba(167,139,250,0.14); }
@@ -120,3 +126,22 @@ def cards(items):
     html = "".join(f'<div class="qx-card"><div class="n">{n}</div><h4>{h}</h4><p>{t}</p></div>'
                    for n, h, t in items)
     st.markdown(f'<div class="qx-cards">{html}</div>', unsafe_allow_html=True)
+
+
+def account_corner():
+    """Sign in / sign out, pinned to the top-right corner of every page."""
+    import community
+    if not community.login_ready():
+        return
+    try:
+        box = st.container(key="qx_account")
+    except TypeError:                 # older Streamlit: falls back to the top of the page
+        box = st.container()
+    with box:
+        if community.signed_in():
+            with st.popover(f"👤 {community.user_label()}"):
+                st.caption("Signed in with SSOJet")
+                if st.button("Sign out", key="corner_signout"):
+                    st.logout()
+        elif st.button("Sign in", key="corner_signin", type="primary"):
+            st.login(community.PROVIDER)

@@ -25,7 +25,6 @@ LIVE_LIMIT = 20          # seconds one dial setting may take before we stop it
 PLAYERS = 3
 SHOTS = 25               # rounds per deal; 3 players have 4 deals, so 100 rounds
 
-community.sidebar_account()
 import ui  # noqa: E402
 ui.hero("The accuracy test", "Can the simulator keep the quantum team perfect?",
         "Turn Quantum Rings' compression dial down and watch when the quantum team "

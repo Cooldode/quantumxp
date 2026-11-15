@@ -91,23 +91,26 @@ def sign_in_box(key, why="publish your results"):
     return False
 
 
-def sidebar_account():
-    """Shows who is signed in, with a sign-out button. Hidden for guests."""
-    if not signed_in():
-        return
-    with st.sidebar:
-        st.caption(f"Signed in as **{user_label()}** · SSOJet")
-        if st.button("Sign out", key="sidebar_signout"):
-            st.logout()
-
-
 # ---------- Receipts ----------
 
-def machine_info():
+def total_ram_bytes():
+    """This computer's real memory in bytes, or None if it can't be read."""
     try:
-        ram = round(os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2**30)
+        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
     except (ValueError, OSError, AttributeError):
-        ram = None
+        pass
+    try:                                   # macOS fallback
+        import subprocess
+        out = subprocess.run(["sysctl", "-n", "hw.memsize"], capture_output=True,
+                             text=True, timeout=2).stdout.strip()
+        return int(out) if out else None
+    except Exception:
+        return None
+
+
+def machine_info():
+    ram_bytes = total_ram_bytes()
+    ram = round(ram_bytes / 2**30) if ram_bytes else None
     mac = platform.mac_ver()[0]
     try:
         sdk = importlib.metadata.version("QuantumRingsLib")

@@ -5,6 +5,7 @@ import ui
 
 st.set_page_config(page_title="QuantumXP", page_icon=ui.FAVICON, layout="centered")
 ui.apply_style()
+ui.account_corner()
 
 pages = [
     st.Page("play.py", title="Play the game", icon="🎮",

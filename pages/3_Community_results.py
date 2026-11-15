@@ -15,7 +15,6 @@ import community  # noqa: E402
 
 CLASSICAL_LINE = 75.0   # best classical team with 3 players
 
-community.sidebar_account()
 import ui  # noqa: E402
 ui.hero("Community", "Results from real laptops",
         "Every run here is a real accuracy test published from someone's laptop. "

@@ -5,6 +5,7 @@ reach fast. This page lets people find the line themselves, with real runs
 on the Quantum Rings simulator.
 """
 import json
+import math
 import os
 import sys
 
@@ -18,7 +19,6 @@ import community  # noqa: E402  (SSOJet sign-in)
 LIVE_LIMIT = 30      # seconds a live run may take before we give up on it
 FAST_SECONDS = 1.0   # "fast" means the simulation itself finished in under this
 
-community.sidebar_account()
 import ui  # noqa: E402
 ui.hero("Laptop vs. quantum", "Can a laptop keep up?",
         "How Quantum Rings simulates hundreds of qubits on an ordinary laptop, "
@@ -34,10 +34,11 @@ tab_idea, tab_guess, tab_dial, tab_measured = st.tabs(
 
 
 def human_bytes(count):
+    """Binary units (1 GB = 1024^3 bytes), the way computers report memory."""
     for unit in ("bytes", "KB", "MB", "GB", "TB", "PB", "EB"):
-        if count < 1000:
-            return f"{count:,.0f} {unit}"
-        count /= 1000
+        if count < 1024:
+            return f"{count:,.0f} {unit}" if count >= 10 or unit == "bytes" else f"{count:.1f} {unit}"
+        count /= 1024
     return f"{count:,.0f} ZB"
 
 
@@ -54,16 +55,29 @@ with tab_idea:
     st.write("The obvious way to simulate qubits is to keep a list with one number for "
              "every possible combination of 0s and 1s. Each extra qubit doubles the list. "
              "Slide to see how fast that gets out of hand.")
+    ram = community.total_ram_bytes()     # measured on this computer, not guessed
     q = st.slider("Number of qubits", 1, 60, 20, key="idea_qubits")
     size = 16 * 2 ** q          # 16 bytes per number
-    st.metric("Memory the full list needs", human_bytes(size))
-    if size <= 16e9:
-        st.success(f"{q} qubits fit in a laptop with 16 GB of memory.")
+    left, right = st.columns(2)
+    left.metric("Memory the full list needs", human_bytes(size))
+    if ram:
+        right.metric("Memory in this computer", human_bytes(ram))
+        limit = int(math.log2(ram / 16))          # most qubits whose list fits
+        if size <= ram:
+            st.success(f"{q} qubits fit in this computer's {human_bytes(ram)} of memory "
+                       f"(using all of it, in theory).")
+        else:
+            st.error(f"{q} qubits do not fit in this computer's {human_bytes(ram)} of memory. "
+                     f"The full list is {size / ram:,.0f} times too big.")
+        st.write(f"On this computer the full list stops fitting after **{limit} qubits**. "
+                 "Yet the game page ran 200 qubits. So the simulator must be doing "
+                 "something smarter.")
     else:
-        st.error(f"{q} qubits do not fit in a laptop with 16 GB of memory. "
-                 f"The full list is {size / 16e9:,.0f} times too big.")
-    st.write("At 30 qubits the full list is already bigger than a typical laptop's memory. "
-             "Yet the game page ran 200 qubits. So the simulator must be doing something smarter.")
+        right.metric("Memory in this computer", "unknown")
+        st.info("This computer didn't report its memory size, so we can't say where "
+                "the full list stops fitting.")
+        st.write("Yet the game page ran 200 qubits. So the simulator must be doing "
+                 "something smarter.")
 
     st.subheader("The smart way: write down only the pattern")
     st.write("Quantum Rings keeps a compact description instead of the full list. "

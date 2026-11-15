@@ -6,7 +6,6 @@ import community
 import game
 import ui
 
-community.sidebar_account()
 ui.hero("Quantum Leap · Quantum Rings SDK",
         "The game no classical team can always win",
         "A cooperative card game where players can't talk. The best classical plan wins "
