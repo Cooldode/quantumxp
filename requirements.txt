@@ -2,4 +2,5 @@ QuantumRingsLib
 streamlit[auth]
 pandas
 altair
-psycopg[binary]
+pymongo
+certifi

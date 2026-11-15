@@ -46,16 +46,16 @@ reports the cheapest setting that keeps the quantum team perfect.
 
 Command-line sweep: `python benchmark.py --accuracy-test --quick`
 
-## Sign in, publish and compare (SSOJet + Tiger Data)
+## Sign in, publish and compare (SSOJet + MongoDB Atlas)
 
 After running the accuracy test you can download a JSON "receipt" of the result, or
-sign in with **SSOJet** and publish it. Published runs are stored in **Tiger Data**
-(PostgreSQL with a time-series hypertable, one row per dial setting) and appear on the
-**Community results** page, so you can compare how different laptops handled the same test.
+sign in with **SSOJet** and publish it. Published runs are stored in **MongoDB Atlas**,
+one document per run holding the whole receipt, and appear on the **Community results**
+page, so you can compare how different laptops handled the same test.
 
 Both are optional. Without them, the app works and explains what is missing.
 To set them up, copy `secrets.toml.example` to `.streamlit/secrets.toml` and fill in your
-SSOJet OIDC client and Tiger Data connection string. That file is in `.gitignore`.
+SSOJet OIDC client and MongoDB Atlas connection string. That file is in `.gitignore`.
 
 ## Run it
 
@@ -78,7 +78,7 @@ streamlit run app.py
 - `pages/2_Can_a_laptop_keep_up.py`: which circuits are easy or hard for a laptop.
 - `benchmark.py`: runs circuits with a time limit; the benchmarks and the accuracy test.
 - `pages/3_Community_results.py`: published results from every laptop.
-- `community.py`: SSOJet sign-in, receipts, and the Tiger Data results table.
+- `community.py`: SSOJet sign-in, receipts, and the MongoDB Atlas results collection.
 - `secrets.toml.example`: template for the private settings file.
 
 ## Honest notes

@@ -1,4 +1,4 @@
-"""Sign-in (SSOJet) and the shared results database (Tiger Data).
+"""Sign-in (SSOJet) and the shared results database (MongoDB Atlas).
 
 Both are optional: if they are not set up in .streamlit/secrets.toml, the
 rest of the app still works and these features explain what is missing.
@@ -14,11 +14,10 @@ rest of the app still works and these features explain what is missing.
     client_secret = "..."
     server_metadata_url = "https://.../.well-known/openid-configuration"
 
-    [tigerdata]
-    url = "postgres://user:password@host:port/tsdb?sslmode=require"
+    [mongodb]
+    url = "mongodb+srv://user:password@cluster0.xxxxx.mongodb.net/"
 """
 import importlib.metadata
-import json
 import os
 import platform
 import uuid
@@ -44,7 +43,7 @@ def login_ready():
 
 
 def database_ready():
-    section = _secrets_section("tigerdata")
+    section = _secrets_section("mongodb")
     return bool(section) and bool(section.get("url"))
 
 
@@ -123,105 +122,65 @@ def build_receipt(rows, players, total, layers, seed, shots):
     }
 
 
-# ---------- Tiger Data ----------
+# ---------- MongoDB Atlas ----------
+#
+# One document per published run: the whole receipt, plus who published it
+# and when. MongoDB stores the JSON receipt as it is, with no table to design.
 
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS receipts (
-    published_at   timestamptz NOT NULL DEFAULT now(),
-    run_id         uuid        NOT NULL,
-    user_name      text,
-    user_email     text,
-    os             text,
-    chip           text,
-    ram_gib        integer,
-    sdk_version    text,
-    players        integer,
-    total_qubits   integer,
-    layers         integer,
-    dial           text,
-    win_rate       real,
-    seconds        real,
-    peak_bytes     bigint,
-    cheapest_perfect_dial text,
-    receipt        jsonb
-)
-"""
+DATABASE = "quantumxp"
+COLLECTION = "runs"
+_client = None
 
 
-def _connect():
-    import psycopg
-    return psycopg.connect(_secrets_section("tigerdata")["url"], connect_timeout=10)
-
-
-def ensure_table(conn):
-    with conn.cursor() as cur:
-        cur.execute(SCHEMA)
-        try:
-            # Tiger Data (TimescaleDB): store the rows as a time-series hypertable.
-            cur.execute("SELECT create_hypertable('receipts', by_range('published_at'), "
-                        "if_not_exists => TRUE)")
-        except Exception:
-            conn.rollback()       # plain PostgreSQL: keep it as a normal table
-            cur.execute(SCHEMA)
-    conn.commit()
+def _runs():
+    """The 'runs' collection, connecting once per app session."""
+    global _client
+    if _client is None:
+        import certifi
+        from pymongo import MongoClient
+        _client = MongoClient(_secrets_section("mongodb")["url"],
+                              serverSelectionTimeoutMS=10000,
+                              tlsCAFile=certifi.where())
+    runs = _client[DATABASE][COLLECTION]
+    runs.create_index("published_at")
+    return runs
 
 
 def publish(receipt):
-    """Saves one receipt: one row per dial setting, grouped by run_id."""
-    run_id = uuid.uuid4()
-    machine, circuit = receipt["machine"], receipt["circuit"]
-    with _connect() as conn:
-        ensure_table(conn)
-        with conn.cursor() as cur:
-            for result in receipt["results"]:
-                cur.execute(
-                    "INSERT INTO receipts (run_id, user_name, user_email, os, chip, "
-                    "ram_gib, sdk_version, players, total_qubits, layers, dial, "
-                    "win_rate, seconds, peak_bytes, cheapest_perfect_dial, receipt) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (run_id, user_label(), user_email(), machine["os"], machine["chip"],
-                     machine["ram_gib"], receipt["sdk"]["version"], circuit["players"],
-                     circuit["total_qubits"], circuit["layers"], result["dial"],
-                     result["win_rate"], result["seconds"], result["peak_bytes"],
-                     receipt["cheapest_perfect_dial"], json.dumps(receipt)))
-        conn.commit()
+    run_id = str(uuid.uuid4())
+    _runs().insert_one({
+        "run_id": run_id,
+        "published_at": datetime.now(timezone.utc),
+        "user_name": user_label(),
+        "user_email": user_email(),
+        **receipt,
+    })
     return run_id
 
 
 def recent_runs(limit=50):
     """One row per published run, newest first."""
-    with _connect() as conn:
-        ensure_table(conn)
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT run_id, max(published_at) AS published_at,
-                       max(user_name), max(os), max(chip), max(ram_gib),
-                       max(total_qubits), max(layers), max(cheapest_perfect_dial),
-                       count(*) AS settings
-                FROM receipts
-                GROUP BY run_id
-                ORDER BY published_at DESC
-                LIMIT %s""", (limit,))
-            columns = ["run_id", "Published", "By", "OS", "Chip", "RAM (GiB)",
-                       "Qubits", "Layers", "Cheapest perfect dial", "Settings tested"]
-            return [dict(zip(columns, row)) for row in cur.fetchall()]
+    rows = []
+    for doc in _runs().find({}, {"_id": 0}).sort("published_at", -1).limit(limit):
+        machine, circuit = doc.get("machine", {}), doc.get("circuit", {})
+        rows.append({"run_id": doc["run_id"], "Published": doc["published_at"],
+                     "By": doc.get("user_name"), "OS": machine.get("os"),
+                     "Chip": machine.get("chip"), "RAM (GiB)": machine.get("ram_gib"),
+                     "Qubits": circuit.get("total_qubits"), "Layers": circuit.get("layers"),
+                     "Cheapest perfect dial": doc.get("cheapest_perfect_dial"),
+                     "Settings tested": len(doc.get("results", []))})
+    return rows
 
 
 def run_points(run_id):
-    with _connect() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT dial, win_rate, seconds, peak_bytes FROM receipts "
-                        "WHERE run_id = %s", (run_id,))
-            return [{"Dial": d, "Win rate (%)": w, "Seconds": s, "Peak bytes": p}
-                    for d, w, s, p in cur.fetchall()]
+    doc = _runs().find_one({"run_id": run_id}, {"_id": 0, "results": 1}) or {}
+    return [{"Dial": r["dial"], "Win rate (%)": r["win_rate"], "Seconds": r["seconds"],
+             "Peak bytes": r["peak_bytes"]} for r in doc.get("results", [])]
 
 
 def summary():
     """Totals for the page header."""
-    with _connect() as conn:
-        ensure_table(conn)
-        with conn.cursor() as cur:
-            cur.execute("SELECT count(DISTINCT run_id), count(DISTINCT user_email), "
-                        "count(DISTINCT chip) FROM receipts")
-            runs, people, chips = cur.fetchone()
-            return {"runs": runs, "people": people, "chips": chips}
+    runs = _runs()
+    return {"runs": runs.count_documents({}),
+            "people": len([e for e in runs.distinct("user_email") if e]),
+            "chips": len(runs.distinct("machine.chip"))}

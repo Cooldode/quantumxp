@@ -18,7 +18,7 @@ import streamlit as st
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import benchmark  # noqa: E402  (runs circuits in a separate process, with a time limit)
-import community  # noqa: E402  (SSOJet sign-in and the Tiger Data results database)
+import community  # noqa: E402  (SSOJet sign-in and the MongoDB Atlas results database)
 import game       # noqa: E402  (the classical limit)
 
 LIVE_LIMIT = 20          # seconds one dial setting may take before we stop it
@@ -177,7 +177,7 @@ if history:
                    "compare how different laptops handle the same test.")
         if community.sign_in_box("acc"):
             if not community.database_ready():
-                st.info("Publishing isn't set up on this laptop yet (the Tiger Data "
+                st.info("Publishing isn't set up on this laptop yet (the MongoDB Atlas "
                         "connection is missing from .streamlit/secrets.toml).")
             elif st.button("Publish to Community results", key="acc_publish"):
                 try:

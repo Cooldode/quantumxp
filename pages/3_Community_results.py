@@ -1,6 +1,6 @@
 """Community results: accuracy tests published from different laptops.
 
-Results are stored in Tiger Data (PostgreSQL with time-series hypertables).
+Results are stored in MongoDB Atlas, one document per published run.
 Publishing needs a sign-in through SSOJet; reading does not.
 """
 import os
@@ -24,8 +24,8 @@ st.write("Every run here is a real accuracy test published from someone's laptop
 community.sign_in_box("community")
 
 if not community.database_ready():
-    st.info("The shared results database isn't set up on this laptop yet (the Tiger "
-            "Data connection is missing from .streamlit/secrets.toml).")
+    st.info("The shared results database isn't set up on this laptop yet (the MongoDB "
+            "Atlas connection is missing from .streamlit/secrets.toml).")
     st.stop()
 
 try:
