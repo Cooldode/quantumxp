@@ -13,11 +13,13 @@ import streamlit as st
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import benchmark  # noqa: E402  (our helper that runs circuits with a time limit)
+import community  # noqa: E402  (SSOJet sign-in)
 
 LIVE_LIMIT = 30      # seconds a live run may take before we give up on it
 FAST_SECONDS = 1.0   # "fast" means the simulation itself finished in under this
 
 st.set_page_config(page_title="Can a laptop keep up?")
+community.sidebar_account()
 st.title("Can a laptop keep up?")
 st.write("In Part 1, a laptop ran a 200-qubit quantum game in a fraction of a second "
          "per round. That sounds impossible, so what is going on? This page lets you "

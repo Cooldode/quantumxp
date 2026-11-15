@@ -85,6 +85,25 @@ def sign_in_box(key):
     return False
 
 
+
+def sidebar_account():
+    """A small account panel in the sidebar of every page."""
+    with st.sidebar:
+        st.markdown("**Account**")
+        if not login_ready():
+            st.caption("Sign-in isn't set up on this laptop.")
+            return
+        if signed_in():
+            st.write(f"Signed in as **{user_label()}**")
+            st.caption("Secured by SSOJet")
+            if st.button("Sign out", key="sidebar_signout"):
+                st.logout()
+        else:
+            st.caption("Sign in to publish your results to the community board.")
+            if st.button("Sign in with SSOJet", key="sidebar_signin", type="primary"):
+                st.login(PROVIDER)
+
+
 # ---------- Receipts ----------
 
 def machine_info():

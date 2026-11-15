@@ -16,6 +16,7 @@ import community  # noqa: E402
 CLASSICAL_LINE = 75.0   # best classical team with 3 players
 
 st.set_page_config(page_title="Community results")
+community.sidebar_account()
 st.title("Community results")
 st.write("Every run here is a real accuracy test published from someone's laptop: how "
          "far the Quantum Rings compression dial could be turned down before the "

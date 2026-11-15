@@ -2,9 +2,11 @@
 import time
 import pandas as pd
 import streamlit as st
+import community
 import game
 
 st.set_page_config(page_title="The game no classical team can always win")
+community.sidebar_account()
 st.title("The game no classical team can always win")
 st.caption("Part 1 of 2. Part 2, \"Can a laptop keep up?\", is in the sidebar on the left.")
 

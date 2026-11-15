@@ -26,6 +26,7 @@ PLAYERS = 3
 SHOTS = 25               # rounds per deal; 3 players have 4 deals, so 100 rounds
 
 st.set_page_config(page_title="The accuracy test")
+community.sidebar_account()
 st.title("The accuracy test")
 st.subheader("Can the simulator keep the quantum team perfect?")
 
