@@ -51,9 +51,13 @@ Command-line sweep: `python benchmark.py --accuracy-test --quick`
 After running the accuracy test you can download a JSON "receipt" of the result, or
 sign in with **SSOJet** and publish it. Published runs are stored in **MongoDB Atlas**,
 one document per run holding the whole receipt, and appear on the **Community results**
-page, so you can compare how different laptops handled the same test.
+page, so you can compare how different laptops handled the same test. Anyone can read
+the board, and signed-in users can reply to a run (replies are a second MongoDB
+collection, linked to the run).
 
-Both are optional. Without them, the app works and explains what is missing.
+You never need an account to play the game or run the tests: sign-in is asked for only
+when you choose to publish a result or reply. If SSOJet or MongoDB isn't set up, the
+app still works and explains what is missing.
 To set them up, copy `secrets.toml.example` to `.streamlit/secrets.toml` and fill in your
 SSOJet OIDC client and MongoDB Atlas connection string. That file is in `.gitignore`.
 
@@ -77,8 +81,8 @@ streamlit run app.py
 - `pages/1_The_accuracy_test.py`: the game as an accuracy test for the simulator.
 - `pages/2_Can_a_laptop_keep_up.py`: which circuits are easy or hard for a laptop.
 - `benchmark.py`: runs circuits with a time limit; the benchmarks and the accuracy test.
-- `pages/3_Community_results.py`: published results from every laptop.
-- `community.py`: SSOJet sign-in, receipts, and the MongoDB Atlas results collection.
+- `pages/3_Community_results.py`: published results from every laptop, with replies.
+- `community.py`: optional SSOJet sign-in, receipts, and the MongoDB Atlas results and replies.
 - `secrets.toml.example`: template for the private settings file.
 
 ## Honest notes

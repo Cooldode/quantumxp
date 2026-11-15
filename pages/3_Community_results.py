@@ -1,7 +1,7 @@
 """Community results: accuracy tests published from different laptops.
 
-Results are stored in MongoDB Atlas, one document per published run.
-Publishing needs a sign-in through SSOJet; reading does not.
+Results and replies are stored in MongoDB Atlas. Anyone can read them;
+publishing or replying needs an optional sign-in through SSOJet.
 """
 import os
 import sys
@@ -20,9 +20,8 @@ community.sidebar_account()
 st.title("Community results")
 st.write("Every run here is a real accuracy test published from someone's laptop: how "
          "far the Quantum Rings compression dial could be turned down before the "
-         "quantum team started losing games.")
-
-community.sign_in_box("community")
+         "quantum team started losing games. Anyone can read the board; sign in "
+         "only if you want to post a result or reply.")
 
 if not community.database_ready():
     st.info("The shared results database isn't set up on this laptop yet (the MongoDB "
@@ -66,3 +65,31 @@ if len(points):
         color="red", strokeDash=[6, 4]).encode(y="y:Q")
     st.altair_chart(line + rule, width="stretch")
     st.caption("Dashed red line: the best a normal team can do with 3 players (75%).")
+
+# ---------- Replies ----------
+st.write("---")
+st.subheader("Replies")
+chosen = runs[pick]["run_id"]
+try:
+    thread = community.replies_for(chosen)
+except Exception as error:
+    thread = []
+    st.error(f"Couldn't load replies: {error}")
+if not thread:
+    st.caption("No replies yet on this run.")
+for reply in thread:
+    when = pd.to_datetime(reply["posted_at"]).strftime("%b %d, %H:%M")
+    with st.chat_message("user"):
+        st.markdown(f"**{reply['user_name']}** · {when}")
+        st.text(reply["text"])
+
+if community.sign_in_box("reply", why="reply to this run"):
+    with st.form("reply_form", clear_on_submit=True):
+        text = st.text_area("Your reply", max_chars=community.MAX_REPLY,
+                            placeholder="Did you get the same cheapest setting on your laptop?")
+        if st.form_submit_button("Post reply"):
+            try:
+                community.post_reply(chosen, text)
+                st.rerun()
+            except Exception as error:
+                st.error(f"Couldn't post: {error}")

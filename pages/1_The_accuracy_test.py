@@ -174,9 +174,9 @@ if history:
         st.download_button("Download receipt (JSON)", json.dumps(receipt, indent=2),
                            file_name="quantumxp_receipt.json", mime="application/json",
                            key="acc_download")
-        st.caption("Publishing adds this run to the Community results page, so you can "
-                   "compare how different laptops handle the same test.")
-        if community.sign_in_box("acc"):
+        st.caption("Publishing is optional. It adds this run to the Community results "
+                   "page, so you can compare how different laptops handle the same test.")
+        if community.sign_in_box("acc", why="publish this run under your name"):
             if not community.database_ready():
                 st.info("Publishing isn't set up on this laptop yet (the MongoDB Atlas "
                         "connection is missing from .streamlit/secrets.toml).")

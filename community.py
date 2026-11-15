@@ -68,40 +68,37 @@ def user_email():
         return None
 
 
-def sign_in_box(key):
-    """Shows the sign-in state with a sign-in or sign-out button."""
+def sign_in_box(key, why="publish your results"):
+    """Optional sign-in, shown only where someone chooses to post something.
+
+    Returns True when the person is signed in. Everything else in the app
+    works without an account.
+    """
     if not login_ready():
         st.info("Sign-in isn't set up on this laptop yet (SSOJet details are missing "
                 "from .streamlit/secrets.toml).")
         return False
     if signed_in():
         left, right = st.columns([3, 1])
-        left.write(f"Signed in as **{user_label()}** (via SSOJet).")
+        left.caption(f"Posting as **{user_label()}** (signed in with SSOJet).")
         if right.button("Sign out", key=f"{key}_signout"):
             st.logout()
         return True
+    st.caption(f"Optional: sign in to {why}. You don't need an account for "
+               "anything else in the app.")
     if st.button("Sign in with SSOJet", key=f"{key}_signin"):
         st.login(PROVIDER)
     return False
 
 
-
 def sidebar_account():
-    """A small account panel in the sidebar of every page."""
+    """Shows who is signed in, with a sign-out button. Hidden for guests."""
+    if not signed_in():
+        return
     with st.sidebar:
-        st.markdown("**Account**")
-        if not login_ready():
-            st.caption("Sign-in isn't set up on this laptop.")
-            return
-        if signed_in():
-            st.write(f"Signed in as **{user_label()}**")
-            st.caption("Secured by SSOJet")
-            if st.button("Sign out", key="sidebar_signout"):
-                st.logout()
-        else:
-            st.caption("Sign in to publish your results to the community board.")
-            if st.button("Sign in with SSOJet", key="sidebar_signin", type="primary"):
-                st.login(PROVIDER)
+        st.caption(f"Signed in as **{user_label()}** · SSOJet")
+        if st.button("Sign out", key="sidebar_signout"):
+            st.logout()
 
 
 # ---------- Receipts ----------
@@ -195,6 +192,40 @@ def run_points(run_id):
     doc = _runs().find_one({"run_id": run_id}, {"_id": 0, "results": 1}) or {}
     return [{"Dial": r["dial"], "Win rate (%)": r["win_rate"], "Seconds": r["seconds"],
              "Peak bytes": r["peak_bytes"]} for r in doc.get("results", [])]
+
+
+# ---------- Replies (the forum part) ----------
+#
+# One document per reply, linked to a published run by run_id.
+
+MAX_REPLY = 1000
+
+
+def _replies():
+    _runs()                                   # opens the shared client
+    replies = _client[DATABASE]["replies"]
+    replies.create_index([("run_id", 1), ("posted_at", 1)])
+    return replies
+
+
+def post_reply(run_id, text):
+    text = text.strip()[:MAX_REPLY]
+    if not text:
+        raise ValueError("The reply is empty.")
+    _replies().insert_one({
+        "run_id": run_id,
+        "posted_at": datetime.now(timezone.utc),
+        "user_name": user_label(),
+        "user_email": user_email(),
+        "text": text,
+    })
+
+
+def replies_for(run_id):
+    """Replies to one run, oldest first. Emails are not returned."""
+    return list(_replies().find({"run_id": run_id},
+                                {"_id": 0, "user_name": 1, "text": 1, "posted_at": 1})
+                .sort("posted_at", 1))
 
 
 def summary():
