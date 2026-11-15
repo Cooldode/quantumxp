@@ -179,5 +179,5 @@ def account_corner():
                 if st.button("Sign out", key="corner_signout"):
                     st.logout()
         elif st.button("Sign in", key="corner_signin", type="primary",
-                       help="Opens the SSOJet sign-in page. Choose Continue with GitHub."):
+                       help="Opens the SSOJet sign-in page. Use your email or Continue with GitHub."):
             st.login(community.PROVIDER)
