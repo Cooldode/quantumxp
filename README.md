@@ -5,6 +5,8 @@
   </picture>
 </p>
 
+**Website:** [quantumxp.us](https://quantumxp.us)
+
 # The game no classical team can always win
 
 A team game that no team of separated classical players can win every round, and that a team sharing
