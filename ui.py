@@ -37,7 +37,7 @@ html, body, .stMarkdown, .stMarkdown p, label, input, textarea, h1, h2, h3, h4 {
 
 /* Account control, pinned to the top-right corner */
 .st-key-qx_account {
-  position: fixed; top: .7rem; right: 4.2rem; z-index: 999991; width: auto !important;
+  position: fixed; top: 4rem; right: 1.4rem; z-index: 999991; width: auto !important;
 }
 .st-key-qx_account button { padding: .35rem .95rem; border-radius: 999px; }
 
@@ -144,6 +144,9 @@ def apply_style():
         st.logo(LOGO, icon_image=FAVICON, size="large")
     except TypeError:                 # older Streamlit without size=
         st.logo(LOGO, icon_image=FAVICON)
+    with st.sidebar:
+        st.caption("[About the project](https://quantumxp.us/about/) · "
+                   "[Code](https://github.com/Cooldode/quantumxp)")
 
 
 def hero(kicker, title, subtitle=""):

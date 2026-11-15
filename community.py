@@ -54,18 +54,34 @@ def signed_in():
         return False
 
 
+def _claim(*names):
+    """First sign-in detail that the provider actually sent, or None."""
+    for name in names:
+        try:
+            value = st.user.get(name)
+        except Exception:
+            value = None
+        if value:
+            return str(value)
+    return None
+
+
 def user_label():
-    try:
-        return st.user.get("name") or st.user.get("email") or "signed-in user"
-    except Exception:
-        return "signed-in user"
+    """A display name. Providers differ in what they send, so try several."""
+    name = _claim("name", "preferred_username", "nickname", "username", "given_name", "email")
+    if name:
+        return name
+    account = _claim("sub")              # always sent: a stable account id
+    return f"user-{account[-6:]}" if account else "signed-in user"
 
 
 def user_email():
-    try:
-        return st.user.get("email")
-    except Exception:
-        return None
+    return _claim("email")
+
+
+def user_id():
+    """Stable id for counting people: the email if we have it, else the account id."""
+    return user_email() or _claim("sub")
 
 
 def sign_in_box(key, why="publish your results"):
@@ -172,6 +188,7 @@ def publish(receipt):
         "published_at": datetime.now(timezone.utc),
         "user_name": user_label(),
         "user_email": user_email(),
+        "user_id": user_id(),
         **receipt,
     })
     return run_id
@@ -220,6 +237,7 @@ def post_reply(run_id, text):
         "posted_at": datetime.now(timezone.utc),
         "user_name": user_label(),
         "user_email": user_email(),
+        "user_id": user_id(),
         "text": text,
     })
 
@@ -256,5 +274,5 @@ def summary():
     """Totals for the page header."""
     runs = _runs()
     return {"runs": runs.count_documents({}),
-            "people": len([e for e in runs.distinct("user_email") if e]),
+            "people": len({e for e in runs.distinct("user_email") + runs.distinct("user_id") if e}),
             "chips": len(runs.distinct("machine.chip"))}

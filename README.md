@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-**Website:** [quantumxp.us](https://quantumxp.us)
+**Live app:** [quantumxp.us](https://quantumxp.us) (opens [quantumxp.streamlit.app](https://quantumxp.streamlit.app)) · **About page with a browser demo:** [quantumxp.us/about](https://quantumxp.us/about/)
 
 # The game no classical team can always win
 
@@ -88,7 +88,7 @@ streamlit run app.py
 
 - `game.py`: the referee, the quantum circuit and the classical team.
 - `app.py`: entry point: page navigation and theme.
-- `docs/`: the website at quantumxp.us, with a small browser version of the game (plain JavaScript, no SDK).
+- `docs/`: quantumxp.us. The front page sends you to the live app; `docs/about/` is the project page, with a small browser version of the game (plain JavaScript, no SDK).
 - `home.py`: the home page.
 - `play.py`: the game.
 - `ui.py`: shared page headers and styling (theme colors in `.streamlit/config.toml`).
