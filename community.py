@@ -231,6 +231,27 @@ def replies_for(run_id):
                 .sort("posted_at", 1))
 
 
+def dial_averages(total_qubits, layers):
+    """The same test across every laptop: win rate at each dial setting.
+
+    One aggregation pipeline, run inside MongoDB: keep the runs that used
+    this circuit size, unpack each run's nested list of results, then group
+    the points by dial setting.
+    """
+    pipeline = [
+        {"$match": {"circuit.total_qubits": total_qubits, "circuit.layers": layers}},
+        {"$unwind": "$results"},
+        {"$group": {"_id": "$results.dial",
+                    "average": {"$avg": "$results.win_rate"},
+                    "lowest": {"$min": "$results.win_rate"},
+                    "runs": {"$sum": 1}}},
+    ]
+    rows = [{"Dial": g["_id"], "Average win rate (%)": round(g["average"], 1),
+             "Lowest win rate (%)": g["lowest"], "Runs": g["runs"]}
+            for g in _runs().aggregate(pipeline)]
+    return sorted(rows, key=lambda r: int(r["Dial"]) if str(r["Dial"]).isdigit() else 10**9)
+
+
 def summary():
     """Totals for the page header."""
     runs = _runs()

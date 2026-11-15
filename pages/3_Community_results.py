@@ -63,6 +63,19 @@ if len(points):
     st.altair_chart(line + rule, width="stretch")
     st.caption("Dashed red line: the best a normal team can do with 3 players (75%).")
 
+# ---------- The same test across all laptops ----------
+qubits, layers = runs[pick]["Qubits"], runs[pick]["Layers"]
+try:
+    across = community.dial_averages(qubits, layers)
+except Exception:
+    across = []
+if across:
+    st.subheader("The same test across all laptops")
+    st.caption(f"Every published run of the {qubits}-qubit, {layers}-layer test, combined. "
+               "MongoDB works this out with one aggregation pipeline over the results "
+               "stored inside each run.")
+    st.dataframe(pd.DataFrame(across), hide_index=True, width="stretch")
+
 # ---------- Replies ----------
 st.write("---")
 st.subheader("Replies")

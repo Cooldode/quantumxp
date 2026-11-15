@@ -62,7 +62,8 @@ sign in with **SSOJet** and publish it. Published runs are stored in **MongoDB A
 one document per run holding the whole receipt, and appear on the **Community results**
 page, so you can compare how different laptops handled the same test. Anyone can read
 the board, and signed-in users can reply to a run (replies are a second MongoDB
-collection, linked to the run).
+collection, linked to the run). The board also compares the same test across all
+laptops, using one MongoDB aggregation pipeline over the results stored inside each run.
 
 You never need an account to play the game or run the tests: sign-in is asked for only
 when you choose to publish a result or reply. If SSOJet or MongoDB isn't set up, the
