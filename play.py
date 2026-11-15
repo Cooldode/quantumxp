@@ -16,12 +16,32 @@ ui.cards([
      "Each player gets a 0 or a 1. The referee always deals an even number of 1-cards."),
     ("02 · NO TALKING", "Answer blind",
      "Each player answers 0 or 1, seeing only their own card."),
-    ("03 · THE WIN", "The total must fit",
-     "Even total when 0, 4, 8… ones were dealt; odd when 2, 6, 10… were dealt."),
+    ("03 · THE WIN", "Add up the answers",
+     "The team wins or loses together. Whether the total must be even or odd "
+     "depends on how many 1-cards were dealt."),
 ])
 st.markdown("""
+**Example with 3 players.** There are only four possible deals:
+
+| Cards dealt | 1-cards | To win, the answers must add up to |
+|---|---|---|
+| 0 · 0 · 0 | none | an **even** number |
+| 1 · 1 · 0 | two | an **odd** number |
+| 1 · 0 · 1 | two | an **odd** number |
+| 0 · 1 · 1 | two | an **odd** number |
+
+Say the cards are 1, 1, 0. If the players answer 1, 0, 0, the total is 1, which is odd, so
+the team **wins**. If they answer 1, 1, 0, the total is 2, which is even, so the team **loses**.
+
+**The catch.** A player holding a 0 can't tell whether the deal was 0 · 0 · 0 (even needed)
+or one with two 1-cards (odd needed), and nobody can ask.
+
+For bigger teams the rule is the same idea: with 0, 4, 8… 1-cards the total must be even,
+and with 2, 6, 10… it must be odd.
+""")
+st.markdown("""
 **Why it is hard.** The right total depends on every card, and each player sees only one.
-No plan agreed in advance can win every time.
+No plan agreed in advance can win every time: with 3 players, the best plan wins 3 deals out of 4.
 
 **How the quantum team wins.** The players share entangled qubits, one each.
 A player holding a 1 gives their qubit a quarter twist, then everyone measures.

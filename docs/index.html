@@ -98,6 +98,10 @@
   .win { color:#86EFAC; } .lose { color:#FCA5A5; }
   .warn { margin-top:12px; padding:10px 14px; border-radius:12px; background:rgba(248,113,113,.12);
           border:1px solid rgba(248,113,113,.4); color:#FECACA; font-size:.92rem; display:none; }
+  table.rules { border-collapse:collapse; margin:14px 0; width:100%; max-width:620px; font-size:.95rem; }
+  table.rules th { text-align:left; color:var(--muted); font-weight:500; padding:8px 12px; border-bottom:1px solid var(--line); }
+  table.rules td { padding:8px 12px; border-bottom:1px solid rgba(167,139,250,.1); font-family:'JetBrains Mono',monospace; }
+  table.rules td:last-child { font-family:inherit; }
   footer { margin:60px 0 0; padding:26px 0 40px; border-top:1px solid var(--line); color:var(--muted); font-size:.9rem;
            display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
   @media (max-width: 820px) {
@@ -185,8 +189,25 @@
         <p>Each player gets a 0 or a 1. The referee always deals an even number of 1-cards.</p></div>
       <div class="card"><div class="n">02 · NO TALKING</div><h3>Answer blind</h3>
         <p>Each player answers 0 or 1, seeing only their own card.</p></div>
-      <div class="card"><div class="n">03 · THE WIN</div><h3>The total must fit</h3>
-        <p>Even total when 0, 4, 8… ones were dealt; odd when 2, 6, 10… were dealt.</p></div>
+      <div class="card"><div class="n">03 · THE WIN</div><h3>Add up the answers</h3>
+        <p>The team wins or loses together. Whether the total must be even or odd depends on how many 1-cards were dealt.</p></div>
+    </div>
+    <div class="panel">
+      <b>Example with 3 players.</b> <span class="sub">There are only four possible deals:</span>
+      <table class="rules">
+        <tr><th>Cards dealt</th><th>1-cards</th><th>To win, the answers must add up to</th></tr>
+        <tr><td>0 · 0 · 0</td><td>none</td><td>an <b>even</b> number</td></tr>
+        <tr><td>1 · 1 · 0</td><td>two</td><td>an <b>odd</b> number</td></tr>
+        <tr><td>1 · 0 · 1</td><td>two</td><td>an <b>odd</b> number</td></tr>
+        <tr><td>0 · 1 · 1</td><td>two</td><td>an <b>odd</b> number</td></tr>
+      </table>
+      <p class="sub">Say the cards are 1, 1, 0. If the players answer 1, 0, 0, the total is 1, which is odd,
+        so the team <b class="win">wins</b>. If they answer 1, 1, 0, the total is 2, which is even, so the team
+        <b class="lose">loses</b>.</p>
+      <p class="sub"><b>The catch.</b> A player holding a 0 can't tell whether the deal was 0 · 0 · 0 (even needed)
+        or one with two 1-cards (odd needed), and nobody can ask. That is why the best classical plan wins only
+        3 deals out of 4. For bigger teams it's the same idea: with 0, 4, 8… 1-cards the total must be even,
+        and with 2, 6, 10… it must be odd.</p>
     </div>
     <div class="panel">
       <b>How the quantum team wins.</b>
