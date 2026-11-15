@@ -187,10 +187,6 @@ if history:
                 except Exception as error:
                     st.error(f"Couldn't publish: {error}")
 
-st.write("**Challenge:** find the cheapest dial setting that keeps the quantum team "
-         "at 100%. Quantum Rings set a very similar challenge at MIT's iQuHACK 2026: "
-         "find the lowest setting that keeps a round trip at least 99% accurate.")
-
 # ---------- Saved sweep from the command line ----------
 saved_path = os.path.join(ROOT, "accuracy_test_results.json")
 if os.path.exists(saved_path):

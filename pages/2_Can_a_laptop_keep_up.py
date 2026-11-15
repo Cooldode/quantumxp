@@ -170,7 +170,6 @@ description, like saving a photo at lower quality: faster and smaller, but a bit
 exactly backward. A perfect simulation ends up right back where it started, scoring
 100%. A rough one ends up close, but not exactly there.
 """)
-    st.write("**Your challenge:** find the lowest dial setting that still scores at least 99%.")
     n = st.slider("Qubits", 6, 30, 20, key="dial_n")
     layers = st.slider("Layers of scrambling", 2, 20, 12, key="dial_layers")
     setting = st.select_slider("Accuracy dial", options=[2, 4, 8, 16, 32, 64, 128, 256],
