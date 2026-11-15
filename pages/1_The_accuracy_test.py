@@ -21,7 +21,8 @@ import benchmark  # noqa: E402  (runs circuits in a separate process, with a tim
 import community  # noqa: E402  (SSOJet sign-in and the MongoDB Atlas results database)
 import game       # noqa: E402  (the classical limit)
 
-LIVE_LIMIT = 20          # seconds one dial setting may take before we stop it
+HOSTED = os.path.isdir("/mount/src")     # true on the free online server, false on a laptop
+LIVE_LIMIT = 150 if HOSTED else 20       # seconds one dial setting may take before we stop it
 PLAYERS = 3
 SHOTS = 25               # rounds per deal; 3 players have 4 deals, so 100 rounds
 
@@ -129,7 +130,7 @@ if b2.button("Sweep the whole dial", key="acc_sweep", type="primary"):
 if history:
     latest = history[-1]
     if latest["Win rate (%)"] is None:
-        st.error(f"The laptop could not finish this setting: {latest['Status']}.")
+        st.error(f"This computer could not finish this setting: {latest['Status']}.")
     else:
         c1, c2, c3 = st.columns(3)
         c1.metric("Quantum team", f"{latest['Win rate (%)']}%")
