@@ -37,7 +37,8 @@ def human_bytes(count):
     """Binary units (1 GB = 1024^3 bytes), the way computers report memory."""
     for unit in ("bytes", "KB", "MB", "GB", "TB", "PB", "EB"):
         if count < 1024:
-            return f"{count:,.0f} {unit}" if count >= 10 or unit == "bytes" else f"{count:.1f} {unit}"
+            whole = count >= 10 or unit == "bytes" or count == int(count)
+            return f"{count:,.0f} {unit}" if whole else f"{count:.1f} {unit}"
         count /= 1024
     return f"{count:,.0f} ZB"
 
@@ -55,25 +56,38 @@ with tab_idea:
     st.write("The obvious way to simulate qubits is to keep a list with one number for "
              "every possible combination of 0s and 1s. Each extra qubit doubles the list. "
              "Slide to see how fast that gets out of hand.")
-    ram = community.total_ram_bytes()     # measured on this computer, not guessed
     q = st.slider("Number of qubits", 1, 60, 20, key="idea_qubits")
     size = 16 * 2 ** q          # 16 bytes per number
+    if ui.viewer_is_local():
+        ram = community.total_ram_bytes()     # measured on this computer, not guessed
+        name, whose = "Memory in this computer", "this computer's"
+    else:
+        # The app is running on our machine, not the visitor's, and a web page
+        # is not allowed to read how much memory a visitor's computer has.
+        choice = st.select_slider(
+            "How much memory does your computer have?", options=[4, 8, 16, 32, 64, 128],
+            value=16, format_func=lambda gb: f"{gb} GB", key="idea_ram")
+        st.caption("Pick your own: a website can't read how much memory your computer has. "
+                   "(On Windows it's in Settings, System, About. On a Mac it's in "
+                   "Apple menu, About This Mac.)")
+        ram = choice * 2 ** 30
+        name, whose = "Memory in your computer", "your computer's"
     left, right = st.columns(2)
     left.metric("Memory the full list needs", human_bytes(size))
     if ram:
-        right.metric("Memory in this computer", human_bytes(ram))
+        right.metric(name, human_bytes(ram))
         limit = int(math.log2(ram / 16))          # most qubits whose list fits
         if size <= ram:
-            st.success(f"{q} qubits fit in this computer's {human_bytes(ram)} of memory "
+            st.success(f"{q} qubits fit in {whose} {human_bytes(ram)} of memory "
                        f"(using all of it, in theory).")
         else:
-            st.error(f"{q} qubits do not fit in this computer's {human_bytes(ram)} of memory. "
+            st.error(f"{q} qubits do not fit in {whose} {human_bytes(ram)} of memory. "
                      f"The full list is {size / ram:,.0f} times too big.")
-        st.write(f"On this computer the full list stops fitting after **{limit} qubits**. "
+        st.write(f"With {human_bytes(ram)} the full list stops fitting after **{limit} qubits**. "
                  "Yet the game page ran 200 qubits. So the simulator must be doing "
                  "something smarter.")
     else:
-        right.metric("Memory in this computer", "unknown")
+        right.metric(name, "unknown")
         st.info("This computer didn't report its memory size, so we can't say where "
                 "the full list stops fitting.")
         st.write("Yet the game page ran 200 qubits. So the simulator must be doing "

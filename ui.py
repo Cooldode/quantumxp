@@ -147,6 +147,9 @@ def apply_style():
     with st.sidebar:
         st.caption("[About the project](https://quantumxp.us/) · "
                    "[Code](https://github.com/Cooldode/quantumxp)")
+        if not viewer_is_local():
+            st.caption("You're using the app over the web. The quantum simulations run "
+                       "on the team's computer, not yours.")
 
 
 def hero(kicker, title, subtitle=""):
@@ -181,3 +184,16 @@ def account_corner():
         elif st.button("Sign in", key="corner_signin", type="primary",
                        help="Opens the SSOJet sign-in page. Use your email or Continue with GitHub."):
             st.login(community.PROVIDER)
+
+
+def viewer_is_local():
+    """True when the browser is on the same computer that is running the app.
+
+    Someone using the app through the website is on a different computer, so
+    anything we measure here (memory, chip) is ours, not theirs.
+    """
+    try:
+        host = (st.context.headers.get("host") or "").split(":")[0].lower()
+    except Exception:
+        return True
+    return host in ("", "localhost", "127.0.0.1", "[")
