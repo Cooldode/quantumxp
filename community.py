@@ -101,7 +101,8 @@ def sign_in_box(key, why="publish your results"):
             st.logout()
         return True
     st.caption(f"Optional: sign in to {why}. You don't need an account for "
-               "anything else in the app.")
+               "anything else in the app. On the sign-in page, choose "
+               "**Continue with GitHub**.")
     if st.button("Sign in with SSOJet", key=f"{key}_signin"):
         st.login(PROVIDER)
     return False
